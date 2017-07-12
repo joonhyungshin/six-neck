@@ -1,0 +1,538 @@
+<!doctype html>
+<html>
+	<head>
+		<title> Connect-6 for KAIST </title>
+		<meta charset="utf-8" />
+		<script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+		<script src="/socket.io/socket.io.js"></script>
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.js"></script> 
+    	<script src="http://malsup.github.com/jquery.form.js"></script>
+		<script language='javascript'>
+			var init_title = 'Connect-6 for KAIST';
+			var note_title = '* Connect-6 for KAIST';
+			var page_focused = true;
+
+			function pageBlur(){
+				page_focused = false;
+			}
+			function pageFocus(){
+				document.title = init_title;
+				page_focused = true;
+			}
+			if (/*@cc_on!@*/false){
+				document.onfocusin = pageFocus;
+				document.onfocusout = pageBlur;
+			}
+			else {
+				window.onfocus = pageFocus;
+				window.onblur = pageBlur;
+			}
+
+			var socket = io(':#port#/six-neck');
+
+			var center = new Point(0, 0);
+			var init = new Array(19);
+			var board = new Array(19);
+			var preview = new Array(19);
+			var color = 0;
+			var cnt = 1;
+			var ingame = true;
+			var aiblack = false;
+			var aiwhite = false;
+			var myname = '';
+			var hist = null;		/* Not initialized */
+			var hist_sz = 0;
+			var cur = 0;
+			for (i=0; i<19; i++){
+				board[i] = new Array(19);
+				init[i] = new Array(19);
+				preview[i] = new Array(19);
+				for (j=0; j<19; j++){
+					if (i == 0){
+						if (j == 0) init[i][j] = '/images/blankul.png';
+						else if (j == 18) init[i][j] = '/images/blankur.png';
+						else init[i][j] = '/images/blanku.png';
+					}
+					else if (i == 18){
+						if (j == 0) init[i][j] = '/images/blankdl.png';
+						else if (j == 18) init[i][j] = '/images/blankdr.png';
+						else init[i][j] = '/images/blankd.png';
+					}
+					else if (j == 0){
+						init[i][j] = '/images/blankl.png';
+					}
+					else if (j == 18){
+						init[i][j] = '/images/blankr.png';
+					}
+					else if ((i-3) % 6 == 0 && (j-3) % 6 == 0){
+						init[i][j] = '/images/blankpt.png';
+					}
+					else {
+						init[i][j] = '/images/blank.png';
+					}
+					board[i][j] = new Image(24, 24);
+					board[i][j].src = init[i][j];
+					board[i][j].id = 'test' + i + '_' + j;
+					board[i][j].xx = i;
+					board[i][j].yy = j;
+					board[i][j].empty = true;
+					board[i][j].style.position = 'absolute';
+					board[i][j].style.left = (center.x + 24*j) + 'px';
+					board[i][j].style.top = (center.y + 24*i) + 'px';
+					board[i][j].style.zIndex = 0;
+
+					preview[i][j] = new Image(24, 24);
+					preview[i][j].src = init[i][j];
+					preview[i][j].id = 'prev' + i + '_' + j;
+					preview[i][j].style.position = 'absolute';
+					preview[i][j].style.left = (center.x + 24*j) + 'px';
+					preview[i][j].style.top = (center.y + 24*i) + 'px';
+					preview[i][j].style.visibility = 'hidden';
+					preview[i][j].style.zIndex = 1;
+					preview[i][j].style.opacity = 0.5;
+					preview[i][j].style.pointerEvents = 'none';
+				}
+			}
+			socket.on('place', function(i, j){
+				boardPlace(i, j, false);
+			});
+			socket.on('restore', function(end){
+				boardPlace(hist[cur].x, hist[cur].y, true);
+				ingame = !end;
+			})
+			socket.on('rollback', function(){
+				ingame = true;
+				var pt = hist[--cur];
+				board[pt.x][pt.y].src = init[pt.x][pt.y];
+				board[pt.x][pt.y].empty = true;
+				if (cnt == 1){
+					pt = hist[cur - 1];
+					if (color == 0) board[pt.x][pt.y].src = '/images/whiter.png';
+					else board[pt.x][pt.y].src = '/images/blackr.png';
+					if (cur > 1){
+						pt = hist[cur - 2];
+						if (color == 0) board[pt.x][pt.y].src = '/images/whiter.png';
+						else board[pt.x][pt.y].src = '/images/blackr.png';
+					}
+				}
+				if (cnt == 2){
+					cnt = 0;
+					color = 1 - color;
+				}
+				cnt++;
+			});
+			socket.on('restore', function(end){
+				ingame = !end;
+			});
+			socket.on('reset', function(){
+				for (i=0; i<19; i++){
+					for (j=0; j<19; j++){
+						board[i][j].src = init[i][j];
+						board[i][j].empty = true;
+					}
+				}
+				color = 0;
+				cnt = 1;
+				ingame = true;
+				hist = [];
+				hist_sz = 0;
+				cur = 0;
+			});
+
+			function boardPlace(i, j, redo){
+				if (cnt == 2){
+					var pt = hist[cur - 1];
+					if (color == 0) board[pt.x][pt.y].src = '/images/whitestone.png';
+					else board[pt.x][pt.y].src = '/images/blackstone.png';
+					if (cur > 1){
+						pt = hist[cur - 2];
+						if (color == 0) board[pt.x][pt.y].src = '/images/whitestone.png';
+						else board[pt.x][pt.y].src = '/images/blackstone.png';
+					}
+				}
+				if (color == 0){
+					board[i][j].src = '/images/blackr.png';
+				}
+				else {
+					board[i][j].src = '/images/whiter.png';
+				}
+				preview[i][j].style.visibility = 'hidden';
+				board[i][j].empty = false;
+				if (redo){
+					cur++;
+				}
+				else {
+					hist[cur++] = new Point(i, j);
+					hist_sz = cur;
+				}
+				cnt--;
+				if (cnt == 0){
+					cnt = 2;
+					color = 1 - color;
+				}
+			}
+
+			function Point(x, y){
+				this.x = x
+				this.y = y
+			}
+		</script>
+		<style type='text/css'>
+		#gameboard {
+			margin-left:5%;
+			width:456px;
+			height:600px;
+			float:left;
+		}
+		#sncanvas {
+			border:1px solid;
+			position:relative;
+			margin-bottom:10px;
+			width:100%;
+			height:456px;
+		}
+		#chatdiv {
+			margin-bottom:10px;
+			margin-right:10%;
+			width:40%;
+			height:100%;
+			float:right;
+		}
+		#chatstat {
+			font-size:16px;
+			font-family:'돋움';
+			margin-left:1%;
+			margin-right:1%;
+			width:100%;
+			height:400px;
+		}
+		#chat {
+			overflow:scroll;
+			word-wrap:break-word;
+			border:1px solid;
+			width:75%;
+			height:100%;
+			float:left;
+		}
+		#user {
+			overflow:scroll;
+			border:1px solid;
+			width:23%;
+			height:100%;
+			white-space:nowrap;
+			float:right;
+		}
+		input#msg {
+			width:85%;
+			margin-left:1%;
+			padding:5px;
+		}
+		button#send {
+			margin-left:1%;
+			width:10%;
+			padding:6px;
+		}
+		</style>
+	</head>
+	<body>
+		<h2> Connect-6 Gameboard by KAIST </h2>
+		<div id='gameboard'>
+			<div id='sncanvas'> </div>
+			<input type='button', value='◀︎︎◀︎︎' id='undo2' />
+			<input type='button' value='◀︎︎' id='undo' />
+			<input type='button' value='▶︎' id='redo' />
+			<input type='button' value='▶︎▶︎' id='redo2' />
+			<input type='button' value='Reset' id='reset' />
+			<input type='checkbox' name='aib' id='aiblack' /> Black AI
+			<input type='checkbox' name='aiw' id='aiwhite' /> White AI
+			<input type='button' value='Launch' id='launch' />
+			<form id='aibupload' action='/uploadb' method='post' enctype='multipart/form-data'>
+				<input type='file' name='aibfile' name='uploadFile' required />
+				<input type='submit' name='uploadb' value='Submit' />
+				<input type='button' id='killb' value='Kill' />
+			</form>
+			<form id='aiwupload' action='/uploadw' method='post' enctype='multipart/form-data'>
+				<input type='file' name='aiwfile' name='uploadFile' required />
+				<input type='submit' name='uploadw' value='Submit' />
+				<input type='button' id='killw' value='Kill' />
+			</form>
+			<!--
+			<select id='aitime'>
+				<option value='1'>1s</option>
+				<option value='2'>2s</option>
+				<option value='3'>3s</option>
+				<option value='4'>4s</option>
+				<option value='5'>5s</option>
+				<option value='6'>6s</option>
+				<option value='7' selected>7s</option>
+				<option value='8'>8s</option>
+				<option value='9'>9s</option>
+				<option value='10'>10s</option>
+				<option value='15'>15s</option>
+				<option value='20'>20s</option>
+				<option value='30'>30s</option>
+				<option value='60'>1m</option>
+				<option value='120'>2m</option>
+				<option value='300'>5m</option>
+			</select>
+			-->
+		</div>
+		<br />
+		<div id='chatdiv'>
+			<form id='chatform' action=''>
+				<div id='chatstat'>
+					<div id='chat'></div>
+					<div id='user'></div>
+				</div>
+				<input id='msg' maxlength=100 type='text' autocomplete='off'><button id='send'> Send </button>
+			</form>
+			<form id='nickname' action=''>
+				<input id='username' maxlength=20 type='text' value='' /><button id='change'> Change </button>
+			</form>
+		</div>
+		<script language='javascript'>
+		$('#launch').on('click', function(){
+			var opt = 0;
+			if (document.getElementById('aiblack').checked){
+				opt += 1;
+			}
+			if (document.getElementById('aiwhite').checked) {
+				opt += 2;
+			}
+			if (opt == 0){
+				alert('At least one of AIs should be checked.');
+			}
+			else {
+				socket.emit('ailaunch', opt);
+			}
+		});
+		$('#undo').on('click', function(){
+			if (aiblack || aiwhite){
+				alert('You cannot undo if AI is launched.');
+			}
+			else if (cur > 0){
+				socket.emit('undo', 1);
+			}
+		});
+		$('#undo2').on('click', function(){
+			if (aiblack || aiwhite){
+				alert('You cannot undo if AI is launched.');
+			}
+			else if (cur > 0){
+				socket.emit('undo', 2);
+			}
+		})
+		$('#redo').on('click', function(){
+			if (!aiblack && !aiwhite && cur < hist_sz){
+				socket.emit('redo', 1);
+			}
+		})
+		$('#redo2').on('click', function(){
+			if (!aiblack && !aiwhite && cur < hist_sz){
+				socket.emit('redo', 2);
+			}
+		})
+		$('#reset').on('click', function(){
+			socket.emit('reset');
+		});
+		$('#nickname').submit(function(){
+			var name = $('#username').val();
+			if (/\s/.test(name)){
+				alert('Your name contains whitespace characters.\nTry again.');
+			}
+			else if (name != ''){
+				socket.emit('username', name);
+			}
+			return false;
+		});
+		$('#chatform').submit(function(){
+			socket.emit('chat', $('#msg').val());
+			$('#msg').val('');
+			$('#msg').focus();
+			return false;
+		});
+		$('#aibupload').submit(function(){
+			$(this).ajaxSubmit();
+			return false;
+		});
+		$('#aiwupload').submit(function(){
+			$(this).ajaxSubmit();
+			return false;
+		});
+		$('#killb').on('click', function(){
+			if (aiblack) socket.emit('kill', 0);
+		});
+		$('#killw').on('click', function(){
+			if (aiwhite) socket.emit('kill', 1);
+		});
+		var canvas = document.getElementById('sncanvas');
+		for (i=0; i<19; i++){
+			for (j=0; j<19; j++){
+				canvas.appendChild(board[i][j]);
+				canvas.appendChild(preview[i][j]);
+				$('#test' + i + '_' + j).on('click', function(){
+					if (this.empty) socket.emit('place', this.xx, this.yy);
+				});
+				$('#test' + i + '_' + j).on('mouseover', function(){
+					if (this.empty && ingame && ((!aiblack && color == 0) || (!aiwhite && color == 1))){
+						var prev = preview[this.xx][this.yy];
+						if (color == 0) prev.src = '/images/blackstone.png';
+						else prev.src = '/images/whitestone.png';
+						prev.style.visibility = 'visible';
+					}
+				});
+				$('#test' + i + '_' + j).on('mouseout', function(){
+					if (this.empty){
+						preview[this.xx][this.yy].style.visibility = 'hidden';
+					}
+				});
+			}
+		}
+		socket.on('init', function(newhist, newsz, newcur, name, end){
+			var i;
+			hist_sz = newsz;
+			cur = newcur;
+			cnt = 1;
+			color = 0;
+			hist = new Array(361);
+			for (i=0; i<hist_sz; i++){
+				var x = newhist[i].x;
+				var y = newhist[i].y;
+				hist[i] = new Point(x, y);
+				if (i < cur){
+					if ((cur % 2 == 1 && i == cur - 2) || i == cur - 1){
+						board[x][y].empty = false;
+						if (color == 0) board[x][y].src = '/images/blackr.png';
+						else board[x][y].src = '/images/whiter.png';
+					}
+					else {
+						board[x][y].empty = false;
+						if (color == 0) board[x][y].src = '/images/blackstone.png';
+						else board[x][y].src = '/images/whitestone.png';
+					}
+					cnt--;
+					if (cnt == 0){
+						cnt = 2;
+						color = 1 - color;
+					}
+				}
+			}
+			ingame = !end;
+			$('#username').val(name);
+			myname = name;
+		});
+		socket.on('users', function(userarray){
+			$('#user').text('');
+			for (var i in userarray){
+				var username = userarray[i];
+				if (username == myname){
+					$('#user').append('<span style=\'background-color:#F2F2F2;\'>' + CodeForces(myname) + '</span><br />');
+				}
+				else {
+					$('#user').append(CodeForces(username) + '<br />');
+				}
+			}
+		});
+		socket.on('you', function(name){
+			myname = name;
+		});
+		socket.on('aiaccept', function(opt){
+			switch (opt){
+				case 1:
+				notice('Black AI launched.');
+				aiblack = true;
+				break;
+				case 2:
+				notice('White AI launched.');
+				aiwhite = true;
+				break;
+				case 3:
+				notice('Black AI and White AI launched.');
+				aiblack = true;
+				aiwhite = true;
+				break;
+				default:
+				alert('Error occurred. Please report this issue.');
+			}
+		});
+		socket.on('aiterm', function(aicolor){
+			if (aicolor == 0){
+				aiblack = false;
+				notice('Black AI terminated.');
+			}
+			else {
+				aiwhite = false;
+				notice('White AI terminated.');
+			}
+		});
+		socket.on('public chat', function(username, msg){
+			msg = msg.replace(':thinking_face:', '🤔');
+			$('#chat').append(CodeForces(username) + ': ');
+			$('#chat').append(document.createTextNode(msg));
+			$('#chat').append('<br />');
+			chat.scrollTop = chat.scrollHeight;
+			if (!page_focused){
+				document.title = note_title;
+			}
+		});
+		socket.on('notice', function(msg){
+			notice(msg);
+		});
+		socket.on('alert', function(msg){
+			alert(msg);
+		});
+		socket.on('win', function(winner){
+			ingame = false;
+			if (winner == 0){
+				notice('Black win.');
+				alert('Black win!');
+			}
+			else {
+				notice('White win.');
+				alert('White win!');
+			}
+		});
+		socket.on('tie', function(){
+			ingame = false;
+			notice('Tie.');
+			alert('Tie.');
+		});
+		socket.on('server close', function(){
+			alert('Server is closed. Sorry for inconvenience.');
+			location.reload();
+		});
+
+		function notice(msg){
+			$('#chat').append('<i>** ' + msg + ' **</i><br />');
+			chat.scrollTop = chat.scrollHeight;
+		}
+
+		function CodeForces(handle){
+			var rating = null;
+			if (handle == 'koosaga') rating = 'red';
+			else if (handle == 'wwiiiii') rating = 'purple';
+			else if (handle == 'alex9801') rating = 'purple';
+			else if (handle == 'OnionPringles') rating = 'red';
+			else if (handle == 'Paohu') rating = 'orange';
+			else if (handle == 'jihoon') rating = 'orange';
+			else if (handle == 'topology') rating = 'purple';
+			else if (handle == 'cubelover') rating = 'nutella';
+			else if (handle == 'tourist') rating = 'nutella';
+			else if (handle == 'Petr') rating = 'nutella';
+			else if (handle == 'tncks0121') rating = 'red';
+			else if (handle == 'ainta') rating = 'nutella';
+			else if (handle == 'appa') rating = 'purple';
+			else if (handle == 'MikeMirzayanov') rating = 'black';
+			if (rating == null){
+				return handle;
+			}
+			else if (rating == 'nutella') {
+				return '<b>' + handle.substring(0, 1) + '</b><font color=\'red\'><b>' + handle.substring(1) + '</b></font>';
+			}
+			else {
+				return '<font color=\'' + rating + '\'><b>' + handle + '</b></font>';
+			}
+		}
+		</script>
+	</body>
+</html>
