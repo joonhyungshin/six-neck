@@ -1,12 +1,10 @@
 # Six-neck (KAIST)
 Six-Neck Connect6 AI
 
-This repository is currently private.
-
 Created by:
 
-* Minkyu Jo
+* [Minkyu Jo](https://github.com/alex9801)
 
-* Taeyoung Jeong
+* [Taeyoung Jeong](https://github.com/wwiiiii)
 
-* Joonhyung Shin
+* [Joonhyung Shin](https://github.com/kuratowski)
