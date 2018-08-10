@@ -1,36 +1,36 @@
 // Samsung Go Tournament Form C (g++-4.8.3)
 
 /*
-[AI ÄÚµå ÀÛ¼º ¹æ¹ı]
+[AI ì½”ë“œ ì‘ì„± ë°©ë²•]
 
-1. char info[]ÀÇ ¹è¿­ ¾È¿¡					"TeamName:ÀÚ½ÅÀÇ ÆÀ¸í,Department:ÀÚ½ÅÀÇ ¼Ò¼Ó"					¼ø¼­·Î ÀÛ¼ºÇÕ´Ï´Ù.
-( ÁÖÀÇ ) Teamname:°ú Department:´Â ²À µé¾î°¡¾ß ÇÕ´Ï´Ù.
-"ÀÚ½ÅÀÇ ÆÀ¸í", "ÀÚ½ÅÀÇ ¼Ò¼Ó"À» ¼öÁ¤ÇØ¾ß ÇÕ´Ï´Ù.
+1. char info[]ì˜ ë°°ì—´ ì•ˆì—					"TeamName:ìì‹ ì˜ íŒ€ëª…,Department:ìì‹ ì˜ ì†Œì†"					ìˆœì„œë¡œ ì‘ì„±í•©ë‹ˆë‹¤.
+( ì£¼ì˜ ) Teamname:ê³¼ Department:ëŠ” ê¼­ ë“¤ì–´ê°€ì•¼ í•©ë‹ˆë‹¤.
+"ìì‹ ì˜ íŒ€ëª…", "ìì‹ ì˜ ì†Œì†"ì„ ìˆ˜ì •í•´ì•¼ í•©ë‹ˆë‹¤.
 
-2. ¾Æ·¡ÀÇ myturn() ÇÔ¼ö ¾È¿¡ ÀÚ½Å¸¸ÀÇ AI ÄÚµå¸¦ ÀÛ¼ºÇÕ´Ï´Ù.
+2. ì•„ë˜ì˜ myturn() í•¨ìˆ˜ ì•ˆì— ìì‹ ë§Œì˜ AI ì½”ë“œë¥¼ ì‘ì„±í•©ë‹ˆë‹¤.
 
-3. AI ÆÄÀÏÀ» Å×½ºÆ® ÇÏ½Ç ¶§´Â "À°¸ñ ¾Ë°í¸®Áò´ëÈ¸ Åø"À» »ç¿ëÇÕ´Ï´Ù.
+3. AI íŒŒì¼ì„ í…ŒìŠ¤íŠ¸ í•˜ì‹¤ ë•ŒëŠ” "ìœ¡ëª© ì•Œê³ ë¦¬ì¦˜ëŒ€íšŒ íˆ´"ì„ ì‚¬ìš©í•©ë‹ˆë‹¤.
 
-4. À°¸ñ ¾Ë°í¸®Áò ´ëÈ¸ ÅøÀÇ ¿¬½ÀÇÏ±â¿¡¼­ ¹ÙµÏµ¹À» ´©¸¥ ÈÄ, ÀÚ½ÅÀÇ "ÆÀ¸í" ÀÌ µé¾î°£ ¾Ë°í¸®ÁòÀ» Ãß°¡ÇÏ¿© Å×½ºÆ® ÇÕ´Ï´Ù.
-
-
-
-[º¯¼ö ¹× ÇÔ¼ö]
-myturn(int cnt) : ÀÚ½ÅÀÇ AI ÄÚµå¸¦ ÀÛ¼ºÇÏ´Â ¸ŞÀÎ ÇÔ¼ö ÀÔ´Ï´Ù.
-int cnt (myturn()ÇÔ¼öÀÇ ÆÄ¶ó¹ÌÅÍ) : µ¹À» ¸î ¼ö µÖ¾ßÇÏ´ÂÁö Á¤ÇÏ´Â º¯¼ö, cnt°¡ 1ÀÌ¸é À°¸ñ ½ÃÀÛ ½Ã  ÇÑ ¹ø¸¸  µÎ´Â »óÈ²(ÇÑ ¹ø), cnt°¡ 2ÀÌ¸é ±× ÀÌÈÄ µ¹À» µÎ´Â »óÈ²(µÎ ¹ø)
-int  x[0], y[0] : ÀÚ½ÅÀÌ µÑ Ã¹ ¹ø Â° µ¹ÀÇ xÁÂÇ¥ , yÁÂÇ¥°¡ ÀúÀåµÇ¾î¾ß ÇÕ´Ï´Ù.
-int  x[1], y[1] : ÀÚ½ÅÀÌ µÑ µÎ ¹ø Â° µ¹ÀÇ xÁÂÇ¥ , yÁÂÇ¥°¡ ÀúÀåµÇ¾î¾ß ÇÕ´Ï´Ù.
-void domymove(int x[], int y[], cnt) : µÑ µ¹µéÀÇ ÁÂÇ¥¸¦ ÀúÀåÇØ¼­ Ãâ·Â
+4. ìœ¡ëª© ì•Œê³ ë¦¬ì¦˜ ëŒ€íšŒ íˆ´ì˜ ì—°ìŠµí•˜ê¸°ì—ì„œ ë°”ë‘‘ëŒì„ ëˆ„ë¥¸ í›„, ìì‹ ì˜ "íŒ€ëª…" ì´ ë“¤ì–´ê°„ ì•Œê³ ë¦¬ì¦˜ì„ ì¶”ê°€í•˜ì—¬ í…ŒìŠ¤íŠ¸ í•©ë‹ˆë‹¤.
 
 
-//int board[BOARD_SIZE][BOARD_SIZE]; ¹ÙµÏÆÇ ÇöÀç»óÈ² ´ã°í ÀÖ¾î ¹Ù·Î»ç¿ë °¡´ÉÇÔ. ´Ü, ¿øº»µ¥ÀÌÅÍ·Î ¼öÁ¤ Àı´ë±İÁö
-// ³õÀ»¼ö ¾ø´Â À§Ä¡¿¡ ¹ÙµÏµ¹À» ³õÀ¸¸é ½Ç°İÆĞ Ã³¸®.
 
-boolean ifFree(int x, int y) : ÇöÀç [x,y]ÁÂÇ¥¿¡ ¹ÙµÏµ¹ÀÌ ÀÖ´ÂÁö È®ÀÎÇÏ´Â ÇÔ¼ö (¾øÀ¸¸é true, ÀÖÀ¸¸é false)
-int showBoard(int x, int y) : [x, y] ÁÂÇ¥¿¡ ¹«½¼ µ¹ÀÌ Á¸ÀçÇÏ´ÂÁö º¸¿©ÁÖ´Â ÇÔ¼ö (1 = ÀÚ½ÅÀÇ µ¹, 2 = »ó´ëÀÇ µ¹, 3 = ºí·°Å·)
+[ë³€ìˆ˜ ë° í•¨ìˆ˜]
+myturn(int cnt) : ìì‹ ì˜ AI ì½”ë“œë¥¼ ì‘ì„±í•˜ëŠ” ë©”ì¸ í•¨ìˆ˜ ì…ë‹ˆë‹¤.
+int cnt (myturn()í•¨ìˆ˜ì˜ íŒŒë¼ë¯¸í„°) : ëŒì„ ëª‡ ìˆ˜ ë‘¬ì•¼í•˜ëŠ”ì§€ ì •í•˜ëŠ” ë³€ìˆ˜, cntê°€ 1ì´ë©´ ìœ¡ëª© ì‹œì‘ ì‹œ  í•œ ë²ˆë§Œ  ë‘ëŠ” ìƒí™©(í•œ ë²ˆ), cntê°€ 2ì´ë©´ ê·¸ ì´í›„ ëŒì„ ë‘ëŠ” ìƒí™©(ë‘ ë²ˆ)
+int  x[0], y[0] : ìì‹ ì´ ë‘˜ ì²« ë²ˆ ì§¸ ëŒì˜ xì¢Œí‘œ , yì¢Œí‘œê°€ ì €ì¥ë˜ì–´ì•¼ í•©ë‹ˆë‹¤.
+int  x[1], y[1] : ìì‹ ì´ ë‘˜ ë‘ ë²ˆ ì§¸ ëŒì˜ xì¢Œí‘œ , yì¢Œí‘œê°€ ì €ì¥ë˜ì–´ì•¼ í•©ë‹ˆë‹¤.
+void domymove(int x[], int y[], cnt) : ë‘˜ ëŒë“¤ì˜ ì¢Œí‘œë¥¼ ì €ì¥í•´ì„œ ì¶œë ¥
 
 
-<-------AI¸¦ ÀÛ¼ºÇÏ½Ç ¶§, °°Àº ÀÌ¸§ÀÇ ÇÔ¼ö ¹× º¯¼ö »ç¿ëÀ» ±ÇÀåÇÏÁö ¾Ê½À´Ï´Ù----->
+//int board[BOARD_SIZE][BOARD_SIZE]; ë°”ë‘‘íŒ í˜„ì¬ìƒí™© ë‹´ê³  ìˆì–´ ë°”ë¡œì‚¬ìš© ê°€ëŠ¥í•¨. ë‹¨, ì›ë³¸ë°ì´í„°ë¡œ ìˆ˜ì • ì ˆëŒ€ê¸ˆì§€
+// ë†“ì„ìˆ˜ ì—†ëŠ” ìœ„ì¹˜ì— ë°”ë‘‘ëŒì„ ë†“ìœ¼ë©´ ì‹¤ê²©íŒ¨ ì²˜ë¦¬.
+
+boolean ifFree(int x, int y) : í˜„ì¬ [x,y]ì¢Œí‘œì— ë°”ë‘‘ëŒì´ ìˆëŠ”ì§€ í™•ì¸í•˜ëŠ” í•¨ìˆ˜ (ì—†ìœ¼ë©´ true, ìˆìœ¼ë©´ false)
+int showBoard(int x, int y) : [x, y] ì¢Œí‘œì— ë¬´ìŠ¨ ëŒì´ ì¡´ì¬í•˜ëŠ”ì§€ ë³´ì—¬ì£¼ëŠ” í•¨ìˆ˜ (1 = ìì‹ ì˜ ëŒ, 2 = ìƒëŒ€ì˜ ëŒ, 3 = ë¸”ëŸ­í‚¹)
+
+
+<-------AIë¥¼ ì‘ì„±í•˜ì‹¤ ë•Œ, ê°™ì€ ì´ë¦„ì˜ í•¨ìˆ˜ ë° ë³€ìˆ˜ ì‚¬ìš©ì„ ê¶Œì¥í•˜ì§€ ì•ŠìŠµë‹ˆë‹¤----->
 */
 
 #include <stdio.h>
@@ -41,9 +41,9 @@ int showBoard(int x, int y) : [x, y] ÁÂÇ¥¿¡ ¹«½¼ µ¹ÀÌ Á¸ÀçÇÏ´ÂÁö º¸¿©ÁÖ´Â ÇÔ¼ö (
 #include <assert.h>
 #include "Connect6Algo.h"
 
-// "»ùÇÃÄÚµå[C]"  -> ÀÚ½ÅÀÇ ÆÀ¸í (¼öÁ¤)
-// "AIºÎ¼­[C]"  -> ÀÚ½ÅÀÇ ¼Ò¼Ó (¼öÁ¤)
-// Á¦Ãâ½Ã ½ÇÇàÆÄÀÏÀº ¹İµå½Ã ÆÀ¸íÀ¸·Î Á¦Ãâ!
+// "ìƒ˜í”Œì½”ë“œ[C]"  -> ìì‹ ì˜ íŒ€ëª… (ìˆ˜ì •)
+// "AIë¶€ì„œ[C]"  -> ìì‹ ì˜ ì†Œì† (ìˆ˜ì •)
+// ì œì¶œì‹œ ì‹¤í–‰íŒŒì¼ì€ ë°˜ë“œì‹œ íŒ€ëª…ìœ¼ë¡œ ì œì¶œ!
 char info[] = { "TeamName:SixNeck,Department:KAIST" };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -51,7 +51,7 @@ char info[] = { "TeamName:SixNeck,Department:KAIST" };
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 const int MY_BOARD_SIZE = 19;
-const int MAX_DEPTH = 2;
+const int MAX_DEPTH = 3;
 const int MAX_CAND = 7;
 const long long INF = 1e15;
 
@@ -101,10 +101,10 @@ FILE * logname;
 void do_the_algorithm()
 {
 	
-    // ÀÌ°Å ¿Ö ¾ÈµÊ ¤Ğ
+    // ì´ê±° ì™œ ì•ˆë¨ ã… 
     montecarlo(0);
     return;
-    // ÇÑ ¼ö¸¸ º»´Ù
+    // í•œ ìˆ˜ë§Œ ë³¸ë‹¤
     
     int i, j, k, l;
     long long r = -INF * 1000, c1, c2;
@@ -155,8 +155,8 @@ void myturn(int cnt) {
 	tcut = 0;
     int x[2], y[2];
 	if (cnt == 1) imfirst = true;
-    // ÀÌ ºÎºĞ¿¡¼­ ¾Ë°í¸®Áò ÇÁ·Î±×·¥(AI)À» ÀÛ¼ºÇÏ½Ê½Ã¿À. ±âº» Á¦°øµÈ ÄÚµå¸¦ ¼öÁ¤ ¶Ç´Â »èÁ¦ÇÏ°í º»ÀÎÀÌ ÄÚµå¸¦ »ç¿ëÇÏ½Ã¸é µË´Ï´Ù.
-    // ÇöÀç Sample codeÀÇ AI´Â RandomÀ¸·Î µ¹À» ³õ´Â AlgorithmÀÌ ÀÛ¼ºµÇ¾î ÀÖ½À´Ï´Ù.
+    // ì´ ë¶€ë¶„ì—ì„œ ì•Œê³ ë¦¬ì¦˜ í”„ë¡œê·¸ë¨(AI)ì„ ì‘ì„±í•˜ì‹­ì‹œì˜¤. ê¸°ë³¸ ì œê³µëœ ì½”ë“œë¥¼ ìˆ˜ì • ë˜ëŠ” ì‚­ì œí•˜ê³  ë³¸ì¸ì´ ì½”ë“œë¥¼ ì‚¬ìš©í•˜ì‹œë©´ ë©ë‹ˆë‹¤.
+    // í˜„ì¬ Sample codeì˜ AIëŠ” Randomìœ¼ë¡œ ëŒì„ ë†“ëŠ” Algorithmì´ ì‘ì„±ë˜ì–´ ìˆìŠµë‹ˆë‹¤.
 
     if(!myinited)
     {
@@ -177,8 +177,8 @@ void myturn(int cnt) {
 #endif
 
             update_eval({ op_x[i], op_y[i] });
-			for (int newx = op_x[i] - 3; newx <= op_x[i] + 3; newx++) {
-				for (int newy = op_y[i] - 3; newy <= op_y[i] + 3; newy++) {
+			for (int newx = op_x[i] - 2; newx <= op_x[i] + 2; newx++) {
+				for (int newy = op_y[i] - 2; newy <= op_y[i] + 2; newy++) {
 					if (fit(newx, newy) && board[newx][newy] == 0 && isAbled[newx][newy] == false) {
 						isAbled[newx][newy] = true;
 						able.push_back({ newx, newy });
@@ -197,8 +197,8 @@ void myturn(int cnt) {
             fflush(logname);
 #endif
             update_eval({ my_x[i], my_y[i] });
-			for (int newx = my_x[i] - 3; newx <= my_x[i] + 3; newx++) {
-				for (int newy = my_y[i] - 3; newy <= my_y[i] + 3; newy++) {
+			for (int newx = my_x[i] - 2; newx <= my_x[i] + 2; newx++) {
+				for (int newy = my_y[i] - 2; newy <= my_y[i] + 2; newy++) {
 					if (fit(newx, newy) && board[newx][newy] == 0 && isAbled[newx][newy] == false) {
 						isAbled[newx][newy] = true;
 						able.push_back({ newx, newy });
@@ -304,9 +304,9 @@ void myturn(int cnt) {
     fflush(logname);
 #endif
 
-    // ÀÌ ºÎºĞ¿¡¼­ ÀÚ½ÅÀÌ ³õÀ» µ¹À» Ãâ·ÂÇÏ½Ê½Ã¿À.
-    // ÇÊ¼ö ÇÔ¼ö : domymove(x¹è¿­,y¹è¿­,¹è¿­Å©±â)
-    // ¿©±â¼­ ¹è¿­Å©±â(cnt)´Â myturn()ÀÇ ÆÄ¶ó¹ÌÅÍ cnt¸¦ ±×´ë·Î ³Ö¾î¾ßÇÕ´Ï´Ù.
+    // ì´ ë¶€ë¶„ì—ì„œ ìì‹ ì´ ë†“ì„ ëŒì„ ì¶œë ¥í•˜ì‹­ì‹œì˜¤.
+    // í•„ìˆ˜ í•¨ìˆ˜ : domymove(xë°°ì—´,yë°°ì—´,ë°°ì—´í¬ê¸°)
+    // ì—¬ê¸°ì„œ ë°°ì—´í¬ê¸°(cnt)ëŠ” myturn()ì˜ íŒŒë¼ë¯¸í„° cntë¥¼ ê·¸ëŒ€ë¡œ ë„£ì–´ì•¼í•©ë‹ˆë‹¤.
 
     domymove(x, y, cnt);
 }
@@ -563,7 +563,7 @@ std::vector<std::pair<std::pair<int, int>, std::pair<int, int>>> get_candidate(i
     if(cont.empty()) return res;
     long long threshold = cont[min((int)cont.size()-1, cand_num - 1)].first;
     int left, right;
-    //[left, right) ±¸°£¿¡¼­ contÀÇ °ªÀº threshold¿Í °°À½
+    //[left, right) êµ¬ê°„ì—ì„œ contì˜ ê°’ì€ thresholdì™€ ê°™ìŒ
     left = right = min((int)cont.size() - 1, cand_num - 1);
     while(left - 1 >= 0 && cont[left - 1].first == threshold) left--;
     while(right < (int)cont.size() && cont[right].first == threshold) right++;
@@ -706,7 +706,7 @@ int safe_board2(int a, int b)
 	return board[a][b];
 }
 
-//»ó´ë¹æÀÌ µÑ °÷µéÀ» ¹İÈ¯
+//ìƒëŒ€ë°©ì´ ë‘˜ ê³³ë“¤ì„ ë°˜í™˜
 std::vector<Point> search_death_angle(bool isMyStance)
 {
 	std::vector<Point> cands;
@@ -792,7 +792,7 @@ std::pair<Point, Point> defenseDeath(bool isMyStance)
 {
 	std::pair<Point, Point> best = { {-1,-1}, {-1,-1} }; bool isBestExist = false;
 	long long bestval;
-	std::vector<Point> & enemy_cands = search_death_angle(isMyStance); // ¹«Á¶°Ç ´Ù ºñ¾îÀÖ´Â Ä­¸¸ ÀÖ¾î¾ßµÊ
+	std::vector<Point> & enemy_cands = search_death_angle(isMyStance); // ë¬´ì¡°ê±´ ë‹¤ ë¹„ì–´ìˆëŠ” ì¹¸ë§Œ ìˆì–´ì•¼ë¨
 	if (enemy_cands.empty()) return{ {-1,-1},{-1,-1} };
 	if (enemy_cands.size() == 1) {
 		return{ enemy_cands.front(), {-1, -1} };
